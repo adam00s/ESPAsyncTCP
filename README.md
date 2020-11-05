@@ -1,5 +1,7 @@
 # ESPAsyncTCP 
-[![Build Status](https://travis-ci.org/me-no-dev/ESPAsyncTCP.svg?branch=master)](https://travis-ci.org/me-no-dev/ESPAsyncTCP) ![](https://github.com/me-no-dev/ESPAsyncTCP/workflows/ESP%20Async%20TCP%20CI/badge.svg)
+
+### Fixes
+- callbecks to error and disconnect handlers are ommited if one of closing methods was called
 
 ### Async TCP Library for ESP8266 Arduino
 

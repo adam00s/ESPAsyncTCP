@@ -223,6 +223,8 @@ AsyncClient::AsyncClient(tcp_pcb* pcb):
 }
 
 AsyncClient::~AsyncClient(){
+  ASYNC_TCP_DEBUG("~AsyncClient[%u]:%s\n", getConnectionId(), ((NULL == _pcb) ? " NULL == pcb" : ""));
+  _close_called = true;
   if(_pcb)
     _close();
 
@@ -344,6 +346,8 @@ void AsyncClient::abort(){
   //    of a 2nd call to tcp_abort().
   // 6) Callbacks to _recv() or _connected() with err set, will result in _pcb
   //    set to NULL. Thus, preventing possible calls later to tcp_abort().
+  ASYNC_TCP_DEBUG("~AsyncClient[%u]\n", getConnectionId());
+  _close_called = true;
   if(_pcb) {
     tcp_abort(_pcb);
     _pcb = NULL;
@@ -353,6 +357,8 @@ void AsyncClient::abort(){
 }
 
 void AsyncClient::close(bool now){
+  ASYNC_TCP_DEBUG("close[%u](%d):%s\n", getConnectionId(), now, ((NULL == _pcb) ? " NULL == pcb" : ""));
+  _close_called = true;
   if(_pcb)
     tcp_recved(_pcb, _rx_ack_len);
   if(now)
@@ -362,10 +368,14 @@ void AsyncClient::close(bool now){
 }
 
 void AsyncClient::stop() {
+  ASYNC_TCP_DEBUG("stop[%u]:%s\n", getConnectionId());
+  _close_called = true;
   close(false);
 }
 
 bool AsyncClient::free(){
+  ASYNC_TCP_DEBUG("free[%u]:%s\n", getConnectionId());
+  _close_called = true;
   if(!_pcb)
     return true;
   if(_pcb->state == 0 || _pcb->state > 4)
@@ -493,6 +503,7 @@ void AsyncClient::_connected(std::shared_ptr<ACErrorTracker>& errorTracker, void
 }
 
 void AsyncClient::_close(){
+  ASYNC_TCP_DEBUG("_close[%u]:%s\n", getConnectionId(), ((NULL == _pcb) ? " NULL == pcb" : ""));
   if(_pcb) {
 #if ASYNC_TCP_SSL_ENABLED
     if(_pcb_secure){
@@ -526,9 +537,9 @@ void AsyncClient::_error(err_t err) {
     // made to set to NULL other callbacks.
     _pcb = NULL;
   }
-  if(_error_cb)
+  if(_error_cb && !_close_called)
     _error_cb(_error_cb_arg, this, err);
-  if(_discard_cb)
+  if(_discard_cb && !_close_called)
     _discard_cb(_discard_cb_arg, this);
 }
 

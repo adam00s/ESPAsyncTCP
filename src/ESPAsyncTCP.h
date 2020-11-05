@@ -134,6 +134,7 @@ class AsyncClient {
     uint32_t _pcb_sent_at;
     bool _close_pcb;
     bool _ack_pcb;
+    bool _close_called = false;
     uint32_t _tx_unacked_len;
     uint32_t _tx_acked_len;
     uint32_t _tx_unsent_len;
