@@ -2,6 +2,7 @@
 
 ### Fixes
 - callbecks to error and disconnect handlers are ommited if one of closing methods was called
+- pullrequest #128 - Update ESPAsyncTCPbuffer.cpp - missing response
 
 ### Async TCP Library for ESP8266 Arduino
 
